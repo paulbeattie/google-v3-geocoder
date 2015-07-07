@@ -14,7 +14,8 @@ module Geokit
 
         return GeoLoc.new if !res.is_a?(Net::HTTPSuccess)
         json = res.body
-        logger.debug "Google V3 geocoding. Address: #{address}. Result: #{json}"
+        logger.debug "Google V3 geocoding. Address: #{address}"
+        logger.debug "Google V3 geocoding. Result: #{result}"
         return self.convert_json_to_geoloc(json)
       end
 
@@ -31,7 +32,7 @@ module Geokit
           logger.error "Could not parse JSON from Google: #{json}"
           return GeoLoc.new
         end
-    
+
         if data['status'] != "OK"
           if data['status' ] == 'OVER_QUERY_LIMIT'
             raise Geokit::TooManyQueriesError "Google returned OVER_QUERY_LIMIT: #{json}"
@@ -62,11 +63,11 @@ module Geokit
 
         return geoloc
       end
-  
+
       def self.extract_location(result)
         res = GeoLoc.new
         res.provider = 'google_v3'
-    
+
         res.lat = result['geometry']['location']['lat']
         res.lng = result['geometry']['location']['lng']
 
@@ -106,7 +107,7 @@ module Geokit
           if types.include?('locality')
             res.zip = component['long_name']
           end
-      
+
         end
         res.street_address = [street_number, street_name].reject{|x| x.nil?}.join(" ")
 
